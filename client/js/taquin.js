@@ -12,7 +12,7 @@ $(document).ready(main);
 function main() {
 
     matriz = matriz_prueba //asigna la matriz
-    
+
     cv = document.getElementById('lienzo'); //lienzo es un canvas que contendrá los canvas
     cx = cv.getContext('2d');
 
@@ -29,7 +29,7 @@ function main() {
                 break;
             }
         }
-        moverCanvas(texto)
+        mover(texto)
     }
 
     //movimento('arriba')
@@ -61,7 +61,7 @@ function renderizarMatriz(matriz) {
     for (var i = 0; i < matriz.length; i++) {
         for (var j = 0; j < matriz[0].length; j++) {
 
-            //llena el arreglo de canvas 
+            //llena el arreglo de canvas
             objetosCanvas.push({
                 x: (i * 50), y: (j * 50),
                 width: 46, height: 46,
@@ -74,19 +74,18 @@ function renderizarMatriz(matriz) {
 
     //borra el cuadro de canvas y pone los canvas en el cuadro de canvas
     actualizarCanvas();
-
 }
 
 
 //borra el cuadro de canvas y pone los canvas en el cuadro de canvas
 function actualizarCanvas() {
 
-    cx.clearRect(0, 0, Math.sqrt(objetosCanvas.length) * 50+4, Math.sqrt(objetosCanvas.length) * 50+4);//limpia el 
+    cx.clearRect(0, 0, Math.sqrt(objetosCanvas.length) * 50+4, Math.sqrt(objetosCanvas.length) * 50+4);//limpia el
     cx.fillStyle = '#B2DFDB';//modifica el color del canvas padre, no funciona?????, además dibuja borde ??????
     cx.strokeRect(0, 0, Math.sqrt(objetosCanvas.length) * 50 + 4, Math.sqrt(objetosCanvas.length) * 50 + 4); //modifica el tamaño cavas adra de acuerdo al tam de la matriz
-    
+
     for (var i = 0; i < objetosCanvas.length; i++) {
-        
+
         cx.fillStyle = objetosCanvas[i].color;
         if (objetosCanvas[i].texto=='*') { //en caso de tener texto=*, utilizar otro color
             cx.fillStyle = '#B2DFDB';
@@ -103,7 +102,7 @@ function actualizarCanvas() {
     }
 }
 
-function moverCanvas(texto) {
+function mover(texto) {
 
     var estado = 0;
 
@@ -146,7 +145,7 @@ function moverCanvas(texto) {
                     renderizarMatriz(matriz);
                     estado = 1;
                     break;
-                } else if (i < matriz.length && matriz[i + 1][j] == '*') {
+                } else if (i+1 < matriz.length && matriz[i + 1][j] == '*') {
                     //la posición vacía cambia con el de encima
                     console.log('mover abajo');
                     temp = matriz[i + 1][j];
@@ -158,7 +157,7 @@ function moverCanvas(texto) {
                     renderizarMatriz(matriz);
                     estado = 1;
                     break;
-                } else if (j < matriz.length && matriz[i][j + 1] == '*') {
+                } else if (j+1 < matriz.length && matriz[i][j + 1] == '*') {
                     //la posición vacía cambia con el de la izquierda
                     console.log('mover derecha');
                     temp = matriz[i][j + 1];
@@ -234,41 +233,38 @@ function animacionCanvas(texto1, x1, y1, texto2, x2, y2, movimiento) {
 
 }
 
+function mover_numero(numero){
+    mover(numero);
+}
+
 //llega dirección de movimiento -> número
-function movimento(direccion) {
-
-    var estado = 0;
-
-    //fila i+1
-    for (var i = 0; i < matriz.length; i++) {
-        //Columna j+1
-        if (estado == 1) {
-            break;
-        }
-        for (var j = 0; j < matriz[i].length; j++) {
-            if (matriz[i][j] == '*') {
-                if (direccion == 'arriba') {
-                    moverCanvas(matriz[i - 1][j])
-                    estado = 1;
-                    break;
+function mover_direccion(direccion){
+    var i, j;
+    for (i = 0; i < matriz.length; i++) {
+        for (j = 0; j < matriz.length; j++) {
+            if( matriz[i][j] == '*' ){
+                switch(direccion) {
+                    case 'arriba':
+                        if( i-1 >= 0)
+                            mover(matriz[i-1][j], matriz);
+                        break;
+                    case 'abajo':
+                        if( i+1 < matriz.length)
+                            mover(matriz[i+1][j], matriz);
+                        break;
+                    case 'derecha':
+                        if( j+1 < matriz.length)
+                            mover(matriz[i][j+1], matriz);
+                        break;
+                    case 'izquierda':
+                        if( j-1 >= 0)
+                            mover(matriz[i][j-1], matriz);
+                        break;
+                    default:
+                        console.log('error');
                 }
-                if (direccion == 'abajo') {
-                    moverCanvas(matriz[i + 1][j])
-                    estado = 1;
-                    break;
-                }
-                if (direccion == 'derecha') {
-                    moverCanvas(matriz[i][j + 1])
-                    estado = 1;
-                    break;
-                }
-                if (direccion == 'izquierda') {
-                    moverCanvas(matriz[i][j - 1])
-                    estado = 1;
-                    break;
-                }
+                return;
             }
         }
     }
-
 }

@@ -20,21 +20,15 @@ function taquin(elemento, lado, matriz ){
     var tam = 0;
     for (var i = 0; i < matriz.length; i++) {
         for (var j = 0; j < matriz.length; j++){
-            var elements = canvas.set();
-            var element = canvas.rect(i*50,j*50,50,50);
-            elements.push(element);
-            if( matriz[i][j] == '*' ){
-                id = "cuadro_vacio";
-                texto = canvas.text(i*50+25, j*50+25, "" ).attr({"fill": "black"});
-                elements.attr("fill","blue");
-            }else{
-                id = "cuadro_"+matriz[i][j];
-                texto = canvas.text(i*50+25, j*50+25, matriz[i][j] ).attr({"fill": "black"});
-                elements.attr("fill","purple");
-            }
-            elements.push(texto);
-            elements.click(clickHandler);
-            tam++;
+            cuadros[i]=canvas.rect(i*50, j*50, 50, 50);
+            cuadros[i].attr("fill","blue");
+            if( matriz[i][j] == '*' )
+                texto = canvas.text(i*50+25,j*50+25,"");
+            else
+                texto = canvas.text(i*50+25,j*50+25,matriz[i][j]);
+            cuadros[i].attr({"text":texto});
+            cuadros[i].id="cuadro_"+matriz[i][j];
+            cuadros[i].click(clickHandler);
         }
     }
 }

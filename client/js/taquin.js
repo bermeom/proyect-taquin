@@ -11,12 +11,12 @@ $( document ).ready(function() {
     taquin(document.getElementById('rojo'),150, matriz);
 });
 
+var cuadros = new Array();
 function taquin(elemento, lado, matriz ){
     // Creates canvas 320 × 200 at 10, 50
     var canvas = Raphael(elemento, lado, lado);
 
     var element, id, texto, attr;
-    var cuadros = new Array();
     var tam = 0;
     for (var i = 0; i < matriz.length; i++) {
         for (var j = 0; j < matriz.length; j++){
@@ -33,19 +33,25 @@ function taquin(elemento, lado, matriz ){
     }
 }
 
-/*var eltext = paper.set();
-el = paper.ellipse(0, 0, 30, 20);
-text = paper.text(0, 0, "ellipse").attr({fill: '#ff0000'})
-eltext.push(el);
-eltext.push(text);
-eltext.translate(100,100)*/
-
 function clickHandler(){
-    this.attr("fill","yellow");
-    console.log('id = ' + this.id);
+    var x = this.getBBox().x;
+    var y = this.getBBox().y;
+    var texto = this.attr('text');
+    console.log(cuadros[0].attr['text']);
+    this.animate({x:x+50}, 300);
+    texto = canvas.text(i*50+25,j*50+25,matriz[i][j]);
+
+    /*console.log(this);
+    console.log(cuadros[3]);
+    cuadros[3].animate({x:x+50}, 300);
+    /*for( var i = 0; i<tam*tam; i++ ){
+        if(cuadros[i].id == this.id){
+            cuadros[i].animate({x:x+50, y:y+50}, 1000);
+        }
+    }*/
 }
 
-function controladorMatriz( elemento ){
+function mover( elemento ){
     for (var i = 0; i < matriz.length; i++) {
         for (var j = 0; j < matriz[i].length; j++) {
             if( matriz[i][j] == elemento ){

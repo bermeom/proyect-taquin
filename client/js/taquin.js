@@ -7,19 +7,48 @@ $( document ).ready(function() {
     matriz = matriz_prueba
     renderizarMatriz(matriz);
     tam = 3;
-    taquin(150,150);
+    taquin(document.getElementById('azul'),150, matriz);
+    taquin(document.getElementById('rojo'),150, matriz);
 });
 
-function taquin(elemento, lado ){
+function taquin(elemento, lado, matriz ){
     // Creates canvas 320 × 200 at 10, 50
     var canvas = Raphael(elemento, lado, lado);
 
-    var element;
+    var element, id, texto, attr;
+    var cuadros = new Array();
+    var tam = 0;
     for (var i = 0; i < matriz.length; i++) {
-        for (var j = 0; j < matriz.length; j++) {
-            canvas.rect(i*50,j*50,50,50);
+        for (var j = 0; j < matriz.length; j++){
+            var elements = canvas.set();
+            var element = canvas.rect(i*50,j*50,50,50);
+            elements.push(element);
+            if( matriz[i][j] == '*' ){
+                id = "cuadro_vacio";
+                texto = canvas.text(i*50+25, j*50+25, "" ).attr({"fill": "black"});
+                elements.attr("fill","blue");
+            }else{
+                id = "cuadro_"+matriz[i][j];
+                texto = canvas.text(i*50+25, j*50+25, matriz[i][j] ).attr({"fill": "black"});
+                elements.attr("fill","purple");
+            }
+            elements.push(texto);
+            elements.click(clickHandler);
+            tam++;
         }
     }
+}
+
+/*var eltext = paper.set();
+el = paper.ellipse(0, 0, 30, 20);
+text = paper.text(0, 0, "ellipse").attr({fill: '#ff0000'})
+eltext.push(el);
+eltext.push(text);
+eltext.translate(100,100)*/
+
+function clickHandler(){
+    this.attr("fill","yellow");
+    console.log('id = ' + this.id);
 }
 
 function controladorMatriz( elemento ){

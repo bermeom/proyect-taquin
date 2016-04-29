@@ -12,7 +12,7 @@ var $stage ;
 var $board;
 var $textMsn;
 var $queueFileM;
-
+var finished=false;
 function init() {
   console.log("INI");
   $stage = new createjs.Stage("myTaquin");
@@ -179,14 +179,17 @@ function moveContainer(container,x_,y_){
 
 function handleComplete() {
     //swapFileBoard($boardPlay,$boardPlayGUI,0,0,0,1);
-    console.log("Termino");
+    //console.log("Termino");
     if($queueFileM.length>0){
       //$queueFileM=[];
       for(var i=0;i<$queueFileM.length;i++){
         var tem=$queueFileM[i];
         $queueFileM.splice( i, 1 );
-        swapFileBoard(tem.bp,tem.i,tem.j,tem.newi,tem.newj);
-        console.log("length "+$queueFileM.length);
+        var sw=swapFileBoard(tem.bp,tem.i,tem.j,tem.newi,tem.newj);
+        if(!sw){
+          break;
+        }
+        //console.log("length "+$queueFileM.length);
       }
     }
 }
@@ -198,13 +201,13 @@ function swapFileBoard(bp,i,j,newi,newj){
   console.log(bp.board[i][j].id);
   if(!validatePostFile(bp.gui[bp.board[i][j].id],bp.board[i][j].x,bp.board[i][j].y)){
     $queueFileM.push({bp:bp,i:i,j:j,newi:newi,newj:newj});
-    return;
+    return false;
   }
   moveContainer(bp.gui[bp.board[i][j].id],bp.board[newi][newj].x,bp.board[newi][newj].y);
   var temp=bp.board[newi][newj].id;
   bp.board[newi][newj].id=bp.board[i][j].id;
   bp.board[i][j].id=temp;
-
+  return true;
 }
 
 

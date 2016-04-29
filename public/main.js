@@ -373,6 +373,7 @@ $(function() {
   socket.on('start-frontend', function (data) {
       document.getElementById("timer").innerHTML ="";
       if (inGame){
+          idopponent=-1;
           $round.text("Round: "+(data.round+1));
           messagePlusOne($textMsn,"Round "+(data.round+1),$pwidth,$pheight,50);
       }

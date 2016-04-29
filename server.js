@@ -72,7 +72,6 @@ io.on('connection', function (socket) {
     
     //++numUsers;
     var value;
-    console.log("llegoo "+usersMap.size);
     console.log("Login-frontend "+"Request user "+id+" "+usersMap.get(id));
     if(usersMap.has(id)){
       addedUser = true;
@@ -128,7 +127,6 @@ io.on('connection', function (socket) {
   socket.on('get-users-frontend', function () {
     var score = new Array();
     for (var v of usersMap) {
-        console.log(v[1]);
         score.push(v[1]);
       }
     socket.emit('get-users-frontend-reply', {
@@ -139,9 +137,7 @@ io.on('connection', function (socket) {
   // User frontend is ready
   socket.on('ready-frontend', function (data) {
       console.log("ready-frontend ->");
-      
       if(isReady){
-        console.log(data);
         if(!gameInProgress){
             game = new Map();
             gameInProgress=true;
@@ -156,14 +152,11 @@ io.on('connection', function (socket) {
   // Algorithms strat request
   socket.on('start-request', function (data) {
       console.log("start-request");
-      console.log(data+" "+round);
       //console.log(game.get(socket.id+"").idgame);
       if (gameInProgress&&game.has(socket.id+"") && tournament[round][game.get(socket.id+"").idgame] != -1){
-          console.log("Send reply -> "+n)
           socket.emit('get-matriz', {
                   n_size: n
                   });
-      
       }
       
   });
@@ -171,13 +164,11 @@ io.on('connection', function (socket) {
   socket.on('get-matriz-reply', function (matriz) {
       console.log("get-matriz-reply");
       if (gameInProgress&&game.has(socket.id+"")){
-        console.log(matriz);
         var d=game.get(socket.id);
         var dopponent=game.get(ids[tournament[round][d.idgame]].id);
         dopponent.matriz=convertoMatris(matriz,n);
         dopponent.step=0;
         game.set(ids[tournament[round][d.idgame]].id,dopponent);
-        
         //console.log("Send reply -> "+n+" id "+socket.id+" idopponent "+ids[tournament[round][d.idgame]].id+" "+usersMap.get(ids[tournament[round][d.idgame]].id).username)
         socket.broadcast.emit('solve', {
                 id: ids[tournament[round][d.idgame]].id,
@@ -202,7 +193,6 @@ io.on('connection', function (socket) {
             var i=parseInt(d[1]);
             var j=parseInt(d[2]);
             var r=validateMovement(game.get(socket.id).matriz,i,j);
-            console.log(r);
             if (r.validate){
               game.get(socket.id).matriz=r.matriz;
               game.get(socket.id).step++;
@@ -214,42 +204,44 @@ io.on('connection', function (socket) {
                     newj:r.newj,
                     nstep:nstep
               });
-              sleep(300);
+              sleep(500);
               if(validateBoard(r.matriz)){
                 finished++;
-                console.log("finished => "+socket.id+" "+finished);
+                console.log("finished => "+socket.id+" "+finished+" "+tournament[round][idgame_]);
                 var gamer=game.get(socket.id);
                 var idgame_=gamer.idgame;
                 //
                 ids[idgame_].finished=true;
                 if(ids[tournament[round][idgame_]].finished){
                   //both they ended
+                  var gamer1=usersMap.get(socket.id);
+                  var gamer2=usersMap.get(ids[tournament[round][idgame_]].id);
                   if(gamer.step>game.get(ids[tournament[round][idgame_]].id).step){
-                     usersMap.get(socket.id).points+=3;
-                     usersMap.get(ids[tournament[round][idgame_]].id).points+=0;
+                     gamer1.points=gamer1.points+3;
                   } else if(gamer.step<game.get(ids[tournament[round][idgame_]].id).step){
-                           usersMap.get(socket.id).points+=0;
-                           usersMap.get(ids[tournament[round][idgame_]].id).points+=3;
+                           gamer2.points=gamer2.points+3;
                         }else{
-                             usersMap.get(socket.id).points+=1;
-                             usersMap.get(ids[tournament[round][idgame_]].id).points+=1;
+                             gamer1.points=gamer1.points+1;
+                             gamer2.points=gamer2.points+1;
                         } 
-
+                  usersMap.set(socket.id,gamer1);
+                  usersMap.set(ids[tournament[round][idgame_]].id,gamer2);
                 }
 
                 
-                if((game.size%2==0&&finished>=game.size)||(game.size%2!=0&&finished>=game.size-1)){
+                if((game.size%2==0&&finished>=game.size)||(!(game.size%2==0)&&finished>=game.size-1)){
+                    
                     round++;
                     console.log("finished all participants round "+round+" "+(game.size));
-                    
                     if((game.size%2==0&&round<game.size-1)||(game.size%2!=0&&round<game.size)){
                       for(var i=0;i<ids.length;i++){
                         ids[i].finished=false;
                       }
+                      finished=0;
+                      sleep(800);
                       socket.broadcast.emit('start-frontend',{
                           round:round
                       });
-                      sleep(800);
                       socket.broadcast.emit('start');
                     }else{
                       console.log("finished game");
@@ -259,7 +251,7 @@ io.on('connection', function (socket) {
                       isReady=true;
                     }
                 }
-                socket.emit('ack-solve-finished');
+                //socket.emit('ack-solve-finished');
               }else{
                   socket.emit('ack-solve');
                 }
@@ -284,7 +276,7 @@ io.on('connection', function (socket) {
               clearInterval(intervalCall);
               if(game.size<=1){
                 socket.broadcast.emit('finished-frontend');
-                socket.emit('ack-solve-finished');
+                //socket.emit('ack-solve-finished');
                 gameInProgress=false;
                 return;
               }
@@ -352,12 +344,12 @@ function convertoMatris(matriText,n) {
     var s=matriText.split(" ");
     var m=new Array(n);
     var k=0;
-    console.log("convertoMatris")
+    //console.log("convertoMatris")
     for(var i=0;i<n;i++){
       m[i]=new Array(n);
       for(var j=0;j<n;j++){
         m[i][j]=parseInt(s[k]);
-        console.log(m[i][j]);
+        //console.log(m[i][j]);
         k++;
       }  
     }
@@ -386,11 +378,11 @@ function validateMovement(matriz,i,j) {
     var x=[1,0, 0,-1];
     var y=[0,1,-1, 0];
     var r={validate:false,matriz:matriz,newi:i,newj:j};
-    console.log("validateMovement");
-    console.log(" -------------> "+i+" "+j);
+    //console.log("validateMovement");
+    //console.log(" -------------> "+i+" "+j);
     
     for(var q=0;q<4;q++){
-      console.log((i+x[q])+" "+(j+y[q]));
+      //console.log((i+x[q])+" "+(j+y[q]));
       if(i+x[q]>=0  && j+y[q]>=0 &&i+x[q]<matriz.length  && j+y[q]<matriz.length && matriz[ i+x[q] ][ j+y[q] ]==0){
         r.validate=true;
         matriz[i+x[q]][j+y[q]]=matriz[i][j];

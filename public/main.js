@@ -55,14 +55,20 @@ $(function() {
   }
   
   // Remove gui User
-  function removeUser (data) {
-    $('#user'+users.get(data.username)).remove();
+  function removeUser (id) {
+    $('#user'+id).remove();
   }
   
    // Add gui User
   function addUser (data) {
-    users.set(data.value.username,data.value.id);
-    console.log(data.value.username);
+  
+    if (users.has(data.value.id)){
+      console.log(data.value.points);
+       $('#user'+(data.value.id)).find('#points').text(data.value.points);
+       return; 
+    }
+    users.set(data.value.id,data.value.id);
+    console.log(data.value.username+" "+data.value.id);
     var idUser="user"+data.value.id;
     var $el = $('<li>',{
         'id':idUser
@@ -79,6 +85,7 @@ $(function() {
     })
 
     var $spanPoints=$('<span>',{
+        'id':'points',
         'class':'label label-primary',
         'text':data.value.points
     });
@@ -127,6 +134,7 @@ $(function() {
 
 
   // Log a message
+  
   function log (message, options) {
     var $el = $('<li>').addClass('log').text(message);
     addMessageElement($el, options);
@@ -323,7 +331,8 @@ $(function() {
 
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', function (data) {
-      removeUser (data);
+      console.log("user left "+data.username+" "+data.id);
+      removeUser (data.id);
   });
   
   //==========================================
@@ -346,6 +355,10 @@ $(function() {
   
   socket.on('get-users-frontend-reply', function (data) {
       var d={value:1};
+      //users.get(data.username)
+      /*for (var v of users.keys()) {
+          removeUser(v);
+      }*/
       for (var v of data.score) {
           d.value=v;
           addUser(d);
@@ -404,11 +417,12 @@ $(function() {
       if (inGame){
           console.log("finished-frontend");
           $round.text("");
-
+          idopponent=-1;
           $readyCheck.disabled =false;
           $readyCheck.checked =false;
           inGame=false;
       }
+      socket.emit('get-users-frontend');
   });
   
   socket.emit('get-users-frontend');

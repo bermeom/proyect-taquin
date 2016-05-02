@@ -1,4 +1,4 @@
-# proyect-taquin
+# Taquin-Project-Server
 TAQUIN developed with Node.JS and Socket.io 
 
 

@@ -204,7 +204,7 @@ io.on('connection', function (socket) {
                     newj:r.newj,
                     nstep:nstep
               });
-              sleep(500);
+              sleep(300);
               if(validateBoard(r.matriz)){
                 finished++;
                 console.log("finished => "+socket.id+" "+finished+" "+tournament[round][idgame_]);
@@ -238,10 +238,10 @@ io.on('connection', function (socket) {
                         ids[i].finished=false;
                       }
                       finished=0;
-                      sleep(800);
                       socket.broadcast.emit('start-frontend',{
                           round:round
                       });
+                      sleep(800);
                       socket.broadcast.emit('start');
                     }else{
                       console.log("finished game");

@@ -67,43 +67,22 @@ io.on('connection', function (socket) {
   // when the client emits 'add user-frontend', this listens and executes
   socket.on('add-user-frontend', function (id) {
     if (addedUser) return;
-
     // we store the username in the socket session for this client
-    
-    //++numUsers;
     var value;
-    console.log("Login-frontend "+"Request user "+id+" "+usersMap.get(id));
     if(usersMap.has(id)){
       addedUser = true;
       value=usersMap.get(id);
       socket.id = id;
       socket.username = value.username;
       socket.gui=true;
-      console.log("->>>>>>> LOGIN")
+      console.log("Login-frontend "+"Request user "+id)
     }
     socket.emit('login-frontend', {
       value: value,
       login:addedUser
     });
   });
-
-  //======================================
-  /*
-  // when the client emits 'typing', we broadcast it to others
-  socket.on('typing', function () {
-    socket.broadcast.emit('typing', {
-      username: socket.username
-    });
-  });
-
-  // when the client emits 'stop typing', we broadcast it to others
-  socket.on('stop typing', function () {
-    socket.broadcast.emit('stop typing', {
-      username: socket.username
-    });
-  });
-  */
-  //======================================
+  
   // when the user disconnects.. perform this
   socket.on('disconnect', function () {
     if (addedUser) {
@@ -123,6 +102,10 @@ io.on('connection', function (socket) {
       }
     }
   });
+  socket.on('disconnect-frontend', function () {
+      addedUser=false;
+  });
+  
   // Loading all users
   socket.on('get-users-frontend', function () {
     var score = new Array();
@@ -263,8 +246,6 @@ io.on('connection', function (socket) {
             }
      } 
   });
-  
-
   
   function ready(){
       var seconds=5;

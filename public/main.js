@@ -25,6 +25,8 @@ $(function() {
   var $readyCheck=document.getElementById("checkbox-fa-3");
   // Prompt for setting a username
   var id;
+  var id2;
+  
   var idopponent;
   
   var username;
@@ -41,13 +43,8 @@ $(function() {
   // Sets the client's username
   function setUsername () {
     id = cleanInput($usernameInput.val().trim());
-
-    // If the username is valid
+  // If the username is valid
     if (id) {
-      //$chatPage.show();
-      //$loginPage.fadeOut();
-      //$loginPage.off('click');
-      //$currentInput = $inputMessage.focus();
       console.log("Send id "+id);
       // Tell the server your username
       socket.emit('add-user-frontend', id);
@@ -267,13 +264,7 @@ $(function() {
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
         console.log(login);
-        if (username&&login) {
-          /*
-          sendMessage();
-          socket.emit('stop typing');
-          typing = false;
-          */
-        } else {
+        if (!login)  {
           setUsername();
         }
     }
@@ -304,6 +295,7 @@ $(function() {
     login=connected = data.login;
     if(login){
       username=data.value.username;
+      id2=data.value.id;
       /*log(message, {
         prepend: true
       });*/
@@ -313,10 +305,7 @@ $(function() {
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
       $name.text(username);
-      /*
-        //$chatPage.show();
-      */
-      //addParticipantsMessage(data);
+      $("#error-login").hide();
     }else{
       $("#error-login").show();
       //$("#error-login").text("Incorrect ID. Please try again. "+$usernameInput.val().trim());
@@ -333,6 +322,14 @@ $(function() {
   socket.on('user left', function (data) {
       console.log("user left "+data.username+" "+data.id);
       removeUser (data.id);
+      if(id2==data.id){
+        $game.hide();
+        $usernameInput.val("");
+        $loginPage.on('click');
+        $loginPage.show();
+        login=false;
+        socket.emit('disconnect-frontend');
+      }
   });
   
   //==========================================
